@@ -3,10 +3,11 @@ import classes from './App.module.css';
 
 class App extends Component {
   state = {
-    keywordss: [],
+    keywords: [],
     addTask: false,
     cancelTask: false,
-    dropdown: false
+    dropdown: false,
+    string: ''
   }
 
   getLabels = keyword => {
@@ -27,17 +28,18 @@ class App extends Component {
   }
 
   handleChange = e => {
-    this.setState({
-      dropdown: false
-    })
     const word = e.target.value;
+    this.setState({
+      dropdown: false,
+      string: word
+    })
     if (word.includes("@")) {
       const keywords = this.getLabels(word.substring(word.indexOf('@')+1))
       console.log(keywords)
       keywords.forEach(word => console.log(word));
       this.setState({
         keywords: keywords,
-        dropdown: true
+        dropdown: true,
       })
       console.log(this.state.dropdown)
     }
@@ -72,17 +74,14 @@ class App extends Component {
     }
   }
 
-  handleKeyPress = e => {
-    // when user tabs or press enter, the keyword display on input
-    if (e.keyCode === 9 || e.keyCode === 13) {
-      console.log(this.state.keyword[0])
-      return this.state.keyword[0]
-    }
-  }
-
-  handleClick = () => {
-    console.log(this.state.keyword[0])
-    return this.state.keyword[0]
+  handleClick = (word) => {
+    console.log("Current word:", word)
+    console.log("Prev String:", this.state.string)
+    let string = this.state.string.replace('@','') + word
+    console.log("Current String:", JSON.stringify(string))
+    this.setState({
+      string: string
+    })
   }
 
   render() {
@@ -106,16 +105,17 @@ class App extends Component {
                   className='form-control' 
                   onChange={this.handleChange.bind(this)}
                   type="text"
-                  onKeyPress={this.handleKeyPress.bind(this)} />
-                
+                  value={this.state.string} />      
               </form>
               { this.state.dropdown ? 
                 <div className='mb-5'>
                   { this.state.keywords.map(word => (
-                      <div className='dropdown-item'
-                        onClick={this.handleClick.bind(this)}>
+                      <div 
+                           className='dropdown-item'
+                           key={word}
+                           onClick={() => this.handleClick(word)}>
                           <i className="fas fa-tag" style={ { color: this.handleLabelColor(word) } } />
-                          {word} {this.handleLabelColor(word)}
+                          {word} 
                       </div>
                     ))
                   }
